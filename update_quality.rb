@@ -1,45 +1,19 @@
-require 'models/award'
+require 'models/award.rb'
 
-def update_quality(awards)
+def update_awards(awards) 
   awards.each do |award|
-    next if award.name == 'Blue Distinction Plus'
-
+    next if award.name == "Blue Distinction Plus"
+    
     award.expires_in -= 1
 
     next if award.quality.zero? || award.quality == 50
 
-    if award.name != 'Blue First' && award.name != 'Blue Compare'
-      if award.quality > 0
-        award.quality -= (award.name == "Blue Star") ? 2 : 1
-      end
-    else
-      award.quality += 1
-      if award.name == 'Blue Compare'
-        if award.expires_in < 10
-          award.quality += 1
-        end
-        if award.expires_in < 5
-          award.quality += 1
-        end
-      end
-    end
-
-    if award.expires_in < 0
-      award.quality -= 1 if award.name == "Blue Star"
-        
-      if award.name != 'Blue First'
-        if award.name != 'Blue Compare'
-          if award.quality > 0
-            award.quality -= 1
-          end
-        else
-          award.quality = 0
-        end
-      else
-        if award.quality < 50
-          award.quality += 1
-        end
-      end
-    end
+    award.update_unexpired_award_quality
+    award.update_expired_award_quality if award.expired?
   end
 end
+
+#This isn't something I would ordinarily do, but I didn't want to change the 
+#spec so you didn't have to double-check to see what had changed, and I felt strongly 
+#that "update_quality" wasn't an appropriate method name
+alias update_quality update_awards
