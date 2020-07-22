@@ -5,8 +5,10 @@ def update_awards(awards)
     next if award.name == "Blue Distinction Plus"
     
     award.expires_in -= 1
-
-    next if award.quality.zero? || award.quality == 50
+    
+    award.quality = 0 if award.name == "Blue Compare" && award.expired?
+    
+    next if award.quality.zero? || award.max_quality?
 
     award.update_unexpired_award_quality
     award.update_expired_award_quality if award.expired?
@@ -14,6 +16,5 @@ def update_awards(awards)
 end
 
 #This isn't something I would ordinarily do, but I didn't want to change the 
-#spec so you didn't have to double-check to see what had changed, and I felt strongly 
-#that "update_quality" wasn't an appropriate method name
+#spec, and I felt strongly that "update_quality" wasn't an appropriate method name
 alias update_quality update_awards
